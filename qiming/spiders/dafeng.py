@@ -62,14 +62,14 @@ class DafengSpider(scrapy.Spider):
         #print(self.third_dic)
         self.names = self.generate_names(self.second_dic, self.third_dic)
         #print(self.names)
-        with open('/tmp/names.txt', 'wb') as f:
-            for n in self.names:
-                l = len(n[u'mz'])
-                if l > 2:
-                    print(n[u'mz'])
-                s = str(n) + '\n'
-                f.write(s.encode('utf-8'))
-        raise IOError('xxxx')
+        #with open('/tmp/names.txt', 'wb') as f:
+        #    for n in self.names:
+        #        l = len(n[u'mz'])
+        #        if l > 2:
+        #            print(n[u'mz'])
+        #        s = str(n) + '\n'
+        #        f.write(s.encode('utf-8'))
+        #raise IOError('xxxx')
         self.count = 0
 
     def parse(self, response):
@@ -89,7 +89,7 @@ class DafengSpider(scrapy.Spider):
         if 0 == result:
             return
         name = response.xpath('//form/input/@value').extract()[:2]
-        score = int(result.extract()[0])
+        score = float(result.extract()[0])
 
         yield {u'name':''.join(name), u'score':score}
 
