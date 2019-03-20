@@ -16,8 +16,35 @@ class DafengSpider(scrapy.Spider):
         with open(path, 'r', encoding='utf-8') as f:
             return json.loads(f.read())
 
-    def read_dict(self):
-        pass
+    def read_dict(self, wuxing_file_name):
+        num_pattern = re.compile('(\d+)')
+        try:
+            words_by_attr = [self.wuxing['jin'], self.wuxing['mu'], self.wuxing['shui'], self.wuxing['huo'], self.wuxing['tu']]
+            attr_idx = -1
+            wuxing_path=os.path.join(self.conf_dir, wuxing_file_name)
+            with open(wuxing_path, 'r') as f:
+                for l in f:
+                    l = l.strip()
+                    if 0 == len(l):
+                        continue
+
+                    match = re.match(num_pattern, l)
+                    if match is not None:
+                        strokes = match.group(1)
+                        attr_idx = -1
+                    else:
+                        l = l.split(u'：')[1]
+                        words = []
+                        attr_idx += 1
+                        for c in l:
+                            c = c.strip()
+                            if 0 == len(c):
+                                continue
+                            words.append((c, strokes))
+                        words_by_attr[attr_idx].extend(words)
+        except Exception as e:
+            print(str(e))
+
 
     def read_word(self, n):
         num_pattern = re.compile('(\d+)')
@@ -77,7 +104,7 @@ class DafengSpider(scrapy.Spider):
         cfg = self.get_config('qiming')
         self.out_file_name = cfg['out_file_name']
         self.xs = cfg[u'xs']
-        self.wuxing = {'jin':None, 'mu':None, 'shui':None, 'huo':None, 'tu':None}
+        self.wuxing = {'jin':[], 'mu':[], 'shui':[], 'huo':[], 'tu':[]}
         wuxing_file_name = cfg.get('wuxing_file_name', '')
         if 0 != len(wuxing_file_name):
             self.read_dict(wuxing_file_name)
