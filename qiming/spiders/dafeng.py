@@ -16,6 +16,9 @@ class DafengSpider(scrapy.Spider):
         with open(path, 'r', encoding='utf-8') as f:
             return json.loads(f.read())
 
+    def read_dict(self):
+        pass
+
     def read_word(self, n):
         num_pattern = re.compile('(\d+)')
         sep_pattern = re.compile('\s+')
@@ -74,8 +77,23 @@ class DafengSpider(scrapy.Spider):
         cfg = self.get_config('qiming')
         self.out_file_name = cfg['out_file_name']
         self.xs = cfg[u'xs']
-        self.second_dic = self.read_word(cfg['second_dic_file_name'])
-        self.third_dic = self.read_word(cfg['third_dic_file_name'])
+        self.wuxing = {'jin':None, 'mu':None, 'shui':None, 'huo':None, 'tu':None}
+        wuxing_file_name = cfg.get('wuxing_file_name', '')
+        if 0 != len(wuxing_file_name):
+            self.read_dict(wuxing_file_name)
+
+        second_file_name = cfg['second_dic_file_name']
+        if second_file_name in self.wuxing:
+            self.second_dic = self.wuxing[second_file_name]
+        else:
+            self.second_dic = self.read_word(second_file_name)
+
+        third_file_name = cfg['third_dic_file_name']
+        if third_file_name in self.wuxing:
+            self.third_dic = self.wuxing[third_file_name]
+        else:
+            self.third_dic = self.read_word(third_file_name)
+
         #print(self.xs)
         #print(self.second_dic)
         #print(self.third_dic)
